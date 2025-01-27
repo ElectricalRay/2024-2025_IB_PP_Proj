@@ -12,8 +12,10 @@ export default function Index() {
 
   const handleAddTask = () => {
     Keyboard.dismiss()
-    setTaskItems([...taskItems, task])
-    setTask(undefined)
+    if(task){
+      setTaskItems([...taskItems, task])
+      setTask(undefined)
+    }
   }
 
   const completeTask = (index:number) => {
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#25292e'
   },
   tasksWrapper: {
-    paddingTop: 50,
+    paddingTop: 80,
     paddingHorizontal: 20,
   },
   sectionTitle: {
