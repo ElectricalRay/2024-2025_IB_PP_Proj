@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { Keyboard } from "react-native";
 import { Link } from "expo-router";
 import Task from "@/components/tasks";
@@ -29,7 +29,7 @@ export default function Index() {
       <View style={styles.tasksWrapper}>
         <Text style={styles.sectionTitle}>Today's Tasks</Text>
 
-        <View style={styles.items}>
+        <ScrollView style={styles.items}>
           {
             taskItems.map((item, index) => {
               return (
@@ -39,7 +39,7 @@ export default function Index() {
               )
             })
           }
-        </View>
+        </ScrollView>
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.writeTasksWrapper}>
@@ -70,7 +70,8 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   items: {
-    marginTop: 30
+    marginTop: 30,
+    maxHeight: '85%'
   },
   input: {
     paddingVertical: 15,
