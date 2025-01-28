@@ -2,7 +2,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const setItem = async (key, value) => {
+export const setItem = async (key: string, value: any) => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
@@ -10,7 +10,7 @@ export const setItem = async (key, value) => {
   }
 };
 
-export const getItem = async (key) => {
+export const getItem = async (key: string) => {
   try {
     const value = await AsyncStorage.getItem(key);
     return value != null ? JSON.parse(value) : null;
@@ -20,7 +20,7 @@ export const getItem = async (key) => {
   }
 };
 
-export const removeItem = async (key) => {
+export const removeItem = async (key: string) => {
   try {
     await AsyncStorage.removeItem(key);
   } catch (error) {
@@ -28,7 +28,7 @@ export const removeItem = async (key) => {
   }
 };
 
-export const mergeItem = async (key, value) => {
+export const mergeItem = async (key: string, value: any) => {
   try {
     await AsyncStorage.mergeItem(key, JSON.stringify(value));
   } catch (error) {
@@ -57,17 +57,14 @@ export const getAllItems = async () => {
   try {
     const keys = await AsyncStorage.getAllKeys();
     const items = await AsyncStorage.multiGet(keys);
-    return items.reduce((accumulator, [key, value]) => {
-      accumulator[key] = JSON.parse(value);
-      return accumulator;
-    }, {});
+    return items
   } catch (error) {
     console.error('Error getting all items:', error);
     return {};
   }
 };
 
-export const removeMultiple = async (keys) => {
+export const removeMultiple = async (keys: string[]) => {
     try {
         await AsyncStorage.multiRemove(keys)
     } catch (error) {
@@ -75,7 +72,7 @@ export const removeMultiple = async (keys) => {
     }
 }
 
-export const getMultiple = async (keys) => {
+export const getMultiple = async (keys: string[]) => {
     let values
     try {
         values = await AsyncStorage.multiGet(keys)
@@ -126,10 +123,12 @@ export const getAllTasks = async () => {
     const item2 = await AsyncStorage.getItem("task2")
     const items = await AsyncStorage.multiGet(keys);
 
+    //console.log(await AsyncStorage.getItem("task3"))
+    //console.log(JSON.parse(items[1][1])[0].month)
     //const data1: Data = JSON.parse(item!!);
     //const data2 = JSON.parse(item!!.replace(/\"/g, ''));
-    console.log(JSON.parse(item).day)
-    console.log(JSON.parse(item2)[0].day)
+    //console.log(JSON.parse(item).day)
+    //console.log(JSON.parse(item2)[0].day)
     //console.log(`data1, ${item}`);
     //console.log(`data2, ${data2}`)
   } catch (error) {
