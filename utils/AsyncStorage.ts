@@ -86,3 +86,57 @@ export const getMultiple = async (keys) => {
     }
 }
 
+interface Data {
+  day: number,
+  month: number,
+  year: number
+}
+
+export const getAllTasks = async () => {
+  let result = []
+  const data: Data = {
+    day: 1,
+    month: 12,
+    year: 2000
+  }
+  const data2: Data = {
+    day: 2,
+    month: 12,
+    year: 2000
+  }
+  const data3: Data = {
+    day: 3,
+    month: 12,
+    year: 2000
+  }
+  const data4: Data = {
+    day: 4,
+    month: 12,
+    year: 2000
+  }
+
+  const objArr = [data2, data3, data4]
+  try {
+    AsyncStorage.multiRemove(["task", "task1", "task2", "task3", "task4"])
+    await setItem("task1", data);
+    await setItem("task2", objArr);
+    await setItem("task3", "hello3");
+    const keys = await AsyncStorage.getAllKeys();
+    const item = await AsyncStorage.getItem("task1")
+    const item2 = await AsyncStorage.getItem("task2")
+    const items = await AsyncStorage.multiGet(keys);
+
+    //const data1: Data = JSON.parse(item!!);
+    //const data2 = JSON.parse(item!!.replace(/\"/g, ''));
+    console.log(JSON.parse(item).day)
+    console.log(JSON.parse(item2)[0].day)
+    //console.log(`data1, ${item}`);
+    //console.log(`data2, ${data2}`)
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
+
+
+[["task", "\"hello\""], ["task1", "\"hello1\""], ["task2", "\"hello2\""], ["task3", "\"hello3\""], ["task4", "\"hello4\""]]

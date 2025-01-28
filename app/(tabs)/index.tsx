@@ -3,19 +3,20 @@ import { Keyboard } from "react-native";
 import { Link } from "expo-router";
 import Task from "@/components/tasks";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as asyncStore from "@/utils/AsyncStorage";
 
 export default function Index() {
   const [task, setTask] = useState<string | undefined>();
   const [taskItems, setTaskItems] = useState<any[]>([]);
-
+  
   const handleAddTask = () => {
     Keyboard.dismiss()
     if(task){
       setTaskItems([...taskItems, task])
       setTask(undefined)
     }
+    asyncStore.getAllTasks()
   }
 
   const completeTask = (index:number) => {
