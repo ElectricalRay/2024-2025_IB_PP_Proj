@@ -1,8 +1,10 @@
 // utils/AsyncStorage.js
-
+import { DateTask, WeekTask, DefaultTask, Tasks, DaysOfWeek } from './DataTypes';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const setItem = async (key: string, value: any) => {
+
+
+export const setItem = async (key: string, value: Tasks[]) => {
   try {
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
@@ -13,7 +15,9 @@ export const setItem = async (key: string, value: any) => {
 export const getItem = async (key: string) => {
   try {
     const value = await AsyncStorage.getItem(key);
-    return value != null ? JSON.parse(value) : null;
+    if(value) {
+      return JSON.parse(value)
+    }
   } catch (error) {
     console.error('Error getting item:', error);
     return null;
@@ -112,7 +116,7 @@ export const getAllTasks = async () => {
     year: 2000
   }
 
-  const objArr = [data2, data3, data4]
+  const objArr = [data2, data3, data4] /*
   try {
     AsyncStorage.multiRemove(["task", "task1", "task2", "task3", "task4"])
     await setItem("task1", data);
@@ -122,6 +126,9 @@ export const getAllTasks = async () => {
     const item = await AsyncStorage.getItem("task1")
     const item2 = await AsyncStorage.getItem("task2")
     const items = await AsyncStorage.multiGet(keys);
+    const item3 = await getItem("task3")
+    console.log(item3)
+
 
     //console.log(await AsyncStorage.getItem("task3"))
     //console.log(JSON.parse(items[1][1])[0].month)
@@ -134,7 +141,7 @@ export const getAllTasks = async () => {
   } catch (error) {
     console.log(error)
     return []
-  }
+  } */
 }
 
 

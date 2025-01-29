@@ -5,24 +5,64 @@ import Task from "@/components/tasks";
 import React from "react";
 import { useState, useEffect } from "react";
 import * as asyncStore from "@/utils/AsyncStorage";
+import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/DataTypes";
 
 export default function Index() {
   const [task, setTask] = useState<string | undefined>();
-  const [taskItems, setTaskItems] = useState<any[]>([]);
+  const [taskItems, setTaskItems] = useState<Tasks[]>([]);
   
-  const handleAddTask = () => {
+  
+  useEffect(() => {
+    const getTodayTasks = async () => {
+      try {
+        const todayTasksJSON = await asyncStore.getItem("today")
+        if(todayTasksJSON && todayTasksJSON.length > 0) {
+          const todayTasks = todayTasksJSON;
+          setTaskItems(todayTasks)
+        }
+      } catch (error) {
+        console.log("Error getting today's tasks: ", error)
+      }
+    }
+
+    getTodayTasks();
+  }, [task])
+
+  const handleAddTask = async () => {
     Keyboard.dismiss()
     if(task){
-      setTaskItems([...taskItems, task])
+      const newTask: DefaultTask = {
+        taskDir: task
+      }
+      try {
+        const todayTasksJSON = await asyncStore.getItem("today")
+        if(todayTasksJSON && todayTasksJSON.length > 0){
+          let todayTasks = todayTasksJSON
+          todayTasks.push(newTask)
+          await asyncStore.setItem("today", todayTasks)
+          setTaskItems(todayTasks)
+        } else {
+          const todayTaskArr = [newTask]
+          setTaskItems(todayTaskArr)
+          await asyncStore.setItem("today", todayTaskArr)
+        }
+      } catch (error) {
+        console.log("Error adding new today task to data: ", error)
+      }
       setTask(undefined)
     }
-    asyncStore.getAllTasks()
+    
   }
 
-  const completeTask = (index:number) => {
-    let itemsCopy = [...taskItems];
-    itemsCopy.splice(index, 1)
-    setTaskItems(itemsCopy)
+  const completeTask = async (index:number) => {
+    try {
+      let itemsCopy = [...taskItems];
+      itemsCopy.splice(index, 1) 
+      await asyncStore.setItem("today", itemsCopy)
+      setTaskItems(itemsCopy)
+    } catch (error) {
+      console.log("Error completing task: ", error)
+    }
   }
 
   return (
@@ -35,7 +75,7 @@ export default function Index() {
             taskItems.map((item, index) => {
               return (
                 <TouchableOpacity key={index} onPress={() => completeTask(index)}>
-                  <Task text={item}/>
+                  <Task task={item}/>
                 </TouchableOpacity>
               )
             })

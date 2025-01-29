@@ -1,16 +1,17 @@
 import React from "react";
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/DataTypes";
 
 type Props = {
-    text: String
+    task: Tasks
 }
 
-export default function Task({text}: Props) {
+export default function Task({task}: Props) {
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
                 <View style={styles.square}></View>
-                <Text style={styles.itemText}>{text}</Text>
+                <Text style={styles.itemText}>{task.taskDir}</Text>
             </View>
             <View style={styles.circular}></View>
         </View>

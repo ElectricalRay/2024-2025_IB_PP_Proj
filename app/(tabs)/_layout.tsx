@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
@@ -23,13 +24,22 @@ export default function TabLayout() {
         }} 
       />
       <Tabs.Screen 
-        name="about" 
+        name="weekly" 
         options={{ 
-            title: 'About', 
+            title: 'Weekly', 
             tabBarIcon: ({color, focused}) => (
-                <Ionicons name={focused ? 'information-circle' : 'information-circle-outline'} color={color} size={24}/>
+                <MaterialCommunityIcons name={focused ? 'view-week' : 'view-week-outline'} color={color} size={24}/>
             )
         }} 
+      />
+      <Tabs.Screen
+        name='calender'
+        options={{
+          title: "Calender",
+          tabBarIcon: ({color, focused}) => (
+            <Ionicons name={focused ? 'calendar-sharp' : 'calendar-outline'} color={color} size={24}/>
+          )
+        }}
       />
     </Tabs>
   );
