@@ -56,7 +56,9 @@ export default function WeeklyScreen() {
     if(task) {
       const newTask: WeekTask = {
         day: daySelected,
-        taskDir: task
+        taskDir: task,
+        completed: false,
+        addedoHome: false
       }
       try {
         const dayTasksJSON = await asyncStore.getItem(daySelected)

@@ -5,7 +5,7 @@ import Task from "@/components/tasks";
 import React from "react";
 import { useState, useEffect } from "react";
 import * as asyncStore from "@/utils/AsyncStorage";
-import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/DataTypes";
+import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek} from "@/utils/DataTypes";
 import { TouchableWithoutFeedback } from "react-native";
 
 export default function Index() {
@@ -26,9 +26,10 @@ export default function Index() {
       try {
         const todayWeeklyTasksJSON = await asyncStore.getItem(today)
         if(todayWeeklyTasksJSON && todayWeeklyTasksJSON.length > 0) {
+          const notDoneWeeklyTasks = todayWeeklyTasksJSON.filter((task: WeekTask) => task.completed === false)
           const todayTasksJSON = await asyncStore.getItem("today")
           let allTodayTasks = todayTasksJSON
-          allTodayTasks.push(...todayWeeklyTasksJSON)
+          allTodayTasks.push(...notDoneWeeklyTasks)
           asyncStore.setItem("today", allTodayTasks)
           setTaskItems(allTodayTasks)
         }
@@ -86,6 +87,15 @@ export default function Index() {
   const completeTask = async (index:number) => {
     try {
       let itemsCopy = [...taskItems];
+      if("day" in itemsCopy[index] && "taskDir" in itemsCopy[index] && "completed" in itemsCopy[index]) {
+        const weeklyTasks = await asyncStore.getItem(itemsCopy[index].day)
+        const itemIndex = weeklyTasks.indexOf(itemsCopy[index])
+        if(itemIndex >= 0) {
+          itemsCopy[index].completed = true
+          weeklyTasks[itemIndex] = itemsCopy[index]
+        }
+
+      }
       itemsCopy.splice(index, 1) 
       await asyncStore.setItem("today", itemsCopy)
       setTaskItems(itemsCopy)

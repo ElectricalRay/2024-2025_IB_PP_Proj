@@ -1,7 +1,9 @@
 type DaysOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 interface WeekTask {
     day: DaysOfWeek,
-    taskDir: string
+    taskDir: string,
+    completed: boolean,
+    addedoHome: boolean
 }
 
 interface DefaultTask {
