@@ -4,16 +4,27 @@ import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/Data
 
 type Props = {
     task: Tasks
+    planning?: boolean
+    taskIndex?: number
+    onPress?: (parameter: number) => void
 }
 
-export default function Task({task}: Props) {
+export default function Task(props: Props) {
+    const {task, planning, taskIndex, onPress} = props
+
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
                 <View style={styles.square}></View>
                 <Text style={styles.itemText}>{task.taskDir}</Text>
             </View>
-            <View style={styles.circular}></View>
+            {planning && onPress && taskIndex != undefined ? (
+                <TouchableOpacity onPress={() => onPress(taskIndex)}>
+                    <Text>Remove</Text>
+                </TouchableOpacity>
+            ) : (
+                <View style={styles.circular}></View>
+            )}
         </View>
     )   
 }

@@ -6,11 +6,40 @@ import React from "react";
 import { useState, useEffect } from "react";
 import * as asyncStore from "@/utils/AsyncStorage";
 import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/DataTypes";
+import { TouchableWithoutFeedback } from "react-native";
 
 export default function Index() {
   const [task, setTask] = useState<string | undefined>();
   const [taskItems, setTaskItems] = useState<Tasks[]>([]);
-  
+  const days: DaysOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+
+  const getDay = () => {
+    const today = new Date();
+    const dayNum = today.getDay()
+    const day = days[dayNum]
+    return day
+  }
+
+  useEffect(() => {
+    const today = getDay()
+    const getTodayWeeklyTasks = async () => {
+      try {
+        const todayWeeklyTasksJSON = await asyncStore.getItem(today)
+        if(todayWeeklyTasksJSON && todayWeeklyTasksJSON.length > 0) {
+          const todayTasksJSON = await asyncStore.getItem("today")
+          let allTodayTasks = todayTasksJSON
+          allTodayTasks.push(...todayWeeklyTasksJSON)
+          asyncStore.setItem("today", allTodayTasks)
+          setTaskItems(allTodayTasks)
+        }
+      } catch (error) {
+        console.log("Error getting today's weekly tasks: ", error)
+      }
+    }
+
+    getTodayWeeklyTasks()
+    console.log("today is ", today)
+  }, [])
   
   useEffect(() => {
     const getTodayTasks = async () => {
@@ -66,33 +95,35 @@ export default function Index() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.tasksWrapper}>
-        <Text style={styles.sectionTitle}>Today's Tasks</Text>
+    <TouchableWithoutFeedback onPress={() =>Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <View style={styles.tasksWrapper}>
+          <Text style={styles.sectionTitle}>Today's Tasks</Text>
 
-        <ScrollView style={styles.items}>
-          {
-            taskItems.map((item, index) => {
-              return (
-                <TouchableOpacity key={index} onPress={() => completeTask(index)}>
-                  <Task task={item}/>
-                </TouchableOpacity>
-              )
-            })
-          }
-        </ScrollView>
+          <ScrollView style={styles.items}>
+            {
+              taskItems.map((item, index) => {
+                return (
+                  <TouchableOpacity key={index} onPress={() => completeTask(index)}>
+                    <Task task={item}/>
+                  </TouchableOpacity>
+                )
+              })
+            }
+          </ScrollView>
+        </View>
+
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.writeTasksWrapper}>
+          <TextInput style={styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)}/>
+          <TouchableOpacity onPress={() => handleAddTask()}>
+            <View style={styles.addWrapper}>
+              <Text style={styles.addText}>+</Text>
+            </View>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
+
       </View>
-
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.writeTasksWrapper}>
-        <TextInput style={styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)}/>
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -139,7 +170,7 @@ const styles = StyleSheet.create({
   },
   writeTasksWrapper: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 20,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
