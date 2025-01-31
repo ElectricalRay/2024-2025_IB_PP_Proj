@@ -12,7 +12,8 @@ interface DefaultTask {
 
 interface DateTask {
     date: Date,
-    taskDir: string
+    taskDir: string,
+    addToHome: boolean
 }
 
 type Tasks = DateTask | WeekTask | DefaultTask;
