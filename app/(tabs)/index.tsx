@@ -26,7 +26,13 @@ export default function Index() {
       try {
         const todayWeeklyTasksJSON = await asyncStore.getItem(today)
         if(todayWeeklyTasksJSON && todayWeeklyTasksJSON.length > 0) {
-          const notDoneWeeklyTasks = todayWeeklyTasksJSON.filter((task: WeekTask) => task.completed === false)
+          let notDoneWeeklyTasks = todayWeeklyTasksJSON.filter((task: WeekTask) => task.completed === false && task.addedToHome === false)
+          todayWeeklyTasksJSON.forEach((element: WeekTask) => {
+            if(element.addedToHome === false) {
+              element.addedToHome = true
+            }
+          });
+          await asyncStore.setItem(today, todayWeeklyTasksJSON)
           const todayTasksJSON = await asyncStore.getItem("today")
           let allTodayTasks = todayTasksJSON
           allTodayTasks.push(...notDoneWeeklyTasks)
@@ -89,10 +95,13 @@ export default function Index() {
       let itemsCopy = [...taskItems];
       if("day" in itemsCopy[index] && "taskDir" in itemsCopy[index] && "completed" in itemsCopy[index]) {
         const weeklyTasks = await asyncStore.getItem(itemsCopy[index].day)
-        const itemIndex = weeklyTasks.indexOf(itemsCopy[index])
+        const itemIndex = weeklyTasks.findIndex((arrItem: Tasks) => arrItem.taskDir === itemsCopy[index].taskDir)
+        console.log("weekly tasks: ",weeklyTasks)
+        console.log("item index: ", itemIndex)
+        console.log("items copy index item: ", itemsCopy[index])
         if(itemIndex >= 0) {
-          itemsCopy[index].completed = true
-          weeklyTasks[itemIndex] = itemsCopy[index]
+          weeklyTasks[itemIndex].completed = true
+          await asyncStore.setItem(itemsCopy[index].day, weeklyTasks)
         }
 
       }

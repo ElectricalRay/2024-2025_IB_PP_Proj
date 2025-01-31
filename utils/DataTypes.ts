@@ -3,7 +3,7 @@ interface WeekTask {
     day: DaysOfWeek,
     taskDir: string,
     completed: boolean,
-    addedoHome: boolean
+    addedToHome: boolean
 }
 
 interface DefaultTask {

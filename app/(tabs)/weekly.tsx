@@ -58,7 +58,7 @@ export default function WeeklyScreen() {
         day: daySelected,
         taskDir: task,
         completed: false,
-        addedoHome: false
+        addedToHome: false
       }
       try {
         const dayTasksJSON = await asyncStore.getItem(daySelected)
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   addButton: {
-    backgroundColor: '#9c2cf3',
+    backgroundColor: '#ff3d3d',
     width: 112.5,
     height: 45,
     borderRadius: 45,
