@@ -38,7 +38,7 @@ export default function TabLayout() {
           title: "Calender",
           tabBarIcon: ({color, focused}) => (
             <Ionicons name={focused ? 'calendar-sharp' : 'calendar-outline'} color={color} size={24}/>
-          )
+          ),
         }}
       />
     </Tabs>

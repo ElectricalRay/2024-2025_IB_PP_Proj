@@ -7,12 +7,14 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Task from "@/components/tasks";
 import { Keyboard } from "react-native";
 import { TouchableWithoutFeedback } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function WeeklyScreen() {
   const [daySelected, setDaySelected] = useState<DaysOfWeek>("sunday")
   const [tasksList, setTaskList] = useState<Tasks[]>([]);
   const [addingItem, setAddingItem] = useState<boolean>(false);
   const [task, setTask] = useState<string | undefined>()
+  const isFocused = useIsFocused();
 
   const days: DaysOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
 
@@ -39,13 +41,23 @@ export default function WeeklyScreen() {
     } 
   }, [daySelected])
 
+  useEffect(() => {
+    if(!isFocused) {
+      setAddingItem(false)
+    }
+  }, [isFocused])
+
 
   const removeTask = async (taskIndex:number) => {
     try {
-      let itemsCopy = [...tasksList];
+      let itemsCopy = await asyncStore.getItem(daySelected);
+      let todayItems = await asyncStore.getItem("today")
+      todayItems = todayItems.filter((arrElement: Tasks) => !("day" in arrElement && arrElement.taskDir === itemsCopy[taskIndex].taskDir))
+      await asyncStore.setItem("today", todayItems)
       itemsCopy.splice(taskIndex,1)
       await asyncStore.setItem(daySelected, itemsCopy)
       setTaskList(itemsCopy)
+      console.log(itemsCopy)
     } catch (error) {
       console.log(`Error removing one of ${daySelected}'s tasks`, error)
     }

@@ -2,16 +2,18 @@ import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, Touc
 import { Keyboard } from "react-native";
 import { Link } from "expo-router";
 import Task from "@/components/tasks";
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { useState, useEffect } from "react";
 import * as asyncStore from "@/utils/AsyncStorage";
 import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek} from "@/utils/DataTypes";
 import { TouchableWithoutFeedback } from "react-native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 export default function Index() {
   const [task, setTask] = useState<string | undefined>();
   const [taskItems, setTaskItems] = useState<Tasks[]>([]);
   const days: DaysOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+  const isFocused = useIsFocused();
 
   const getDay = () => {
     const today = new Date();
@@ -21,48 +23,54 @@ export default function Index() {
   }
 
   useEffect(() => {
-    const today = getDay()
-    const getTodayWeeklyTasks = async () => {
-      try {
-        const todayWeeklyTasksJSON = await asyncStore.getItem(today)
-        if(todayWeeklyTasksJSON && todayWeeklyTasksJSON.length > 0) {
-          let notDoneWeeklyTasks = todayWeeklyTasksJSON.filter((task: WeekTask) => task.completed === false && task.addedToHome === false)
-          todayWeeklyTasksJSON.forEach((element: WeekTask) => {
-            if(element.addedToHome === false) {
-              element.addedToHome = true
-            }
-          });
-          await asyncStore.setItem(today, todayWeeklyTasksJSON)
-          const todayTasksJSON = await asyncStore.getItem("today")
-          let allTodayTasks = todayTasksJSON
-          allTodayTasks.push(...notDoneWeeklyTasks)
-          asyncStore.setItem("today", allTodayTasks)
-          setTaskItems(allTodayTasks)
-        }
-      } catch (error) {
-        console.log("Error getting today's weekly tasks: ", error)
-      }
+    if(!isFocused) {
+      setTaskItems([])
     }
+  }, [isFocused])
 
-    getTodayWeeklyTasks()
-    console.log("today is ", today)
-  }, [])
-  
+
+
   useEffect(() => {
-    const getTodayTasks = async () => {
-      try {
-        const todayTasksJSON = await asyncStore.getItem("today")
-        if(todayTasksJSON && todayTasksJSON.length > 0) {
-          const todayTasks = todayTasksJSON;
-          setTaskItems(todayTasks)
+    if(isFocused){
+      const today = getDay()
+      const getTodayWeeklyTasks = async () => {
+        try {
+          const todayWeeklyTasksJSON = await asyncStore.getItem(today)
+          if(todayWeeklyTasksJSON && todayWeeklyTasksJSON.length > 0) {
+            let notDoneWeeklyTasks = todayWeeklyTasksJSON.filter((task: WeekTask) => task.completed === false && task.addedToHome === false)
+            todayWeeklyTasksJSON.forEach((element: WeekTask) => {
+              if(element.addedToHome === false) {
+                element.addedToHome = true
+              }
+            });
+            await asyncStore.setItem(today, todayWeeklyTasksJSON)
+            const todayTasksJSON = await asyncStore.getItem("today")
+            let allTodayTasks = todayTasksJSON
+            allTodayTasks.push(...notDoneWeeklyTasks)
+            asyncStore.setItem("today", allTodayTasks)
+            setTaskItems(allTodayTasks)
+          }
+        } catch (error) {
+          console.log("Error getting today's weekly tasks: ", error)
         }
-      } catch (error) {
-        console.log("Error getting today's tasks: ", error)
       }
-    }
 
-    getTodayTasks();
-  }, [task])
+      const getTodayTasks = async () => {
+        try {
+          const todayTasksJSON = await asyncStore.getItem("today")
+          if(todayTasksJSON && todayTasksJSON.length > 0) {
+            const todayTasks = todayTasksJSON;
+            setTaskItems(todayTasks)
+          }
+        } catch (error) {
+          console.log("Error getting today's tasks: ", error)
+        }
+      }
+      getTodayTasks();
+      getTodayWeeklyTasks()
+
+    }
+  }, [task, isFocused])
 
   const handleAddTask = async () => {
     Keyboard.dismiss()
