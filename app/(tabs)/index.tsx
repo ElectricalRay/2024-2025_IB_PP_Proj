@@ -33,6 +33,17 @@ export default function Index() {
   useEffect(() => {
     if(isFocused){
       const today = getDay()
+
+      const filterOutOldWeeklyTasks = async () => {
+        try {
+          let allTodayTasks = await asyncStore.getItem("today")
+          const filteredTodayTasks = allTodayTasks.filter((element : Tasks) => ("day" in element && element.day === today) || !("day" in element))
+          await asyncStore.setItem("today", filteredTodayTasks)
+        } catch (error) {
+          console.log("Error filtering out old weekly tasks:", error)
+        }
+      }
+
       const getTodayWeeklyTasks = async () => {
         try {
           const todayWeeklyTasksJSON = await asyncStore.getItem(today)
@@ -66,8 +77,10 @@ export default function Index() {
           console.log("Error getting today's tasks: ", error)
         }
       }
+
+      filterOutOldWeeklyTasks();
+      getTodayWeeklyTasks();
       getTodayTasks();
-      getTodayWeeklyTasks()
 
     }
   }, [task, isFocused])
