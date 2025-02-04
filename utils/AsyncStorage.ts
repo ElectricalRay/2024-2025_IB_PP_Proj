@@ -26,6 +26,24 @@ export const getItem = async (key: string) => {
   }
 };
 
+export const getDataItem = async (key: string) => {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    return value != null ? JSON.parse(value) : null;
+  } catch (error) {
+    console.error('Error getting item:', error);
+    return null;
+  }
+};
+
+export const setDataItem = async (key: string, value: string | Date) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error('Error setting item:', error);
+  }
+};
+
 export const removeItem = async (key: string) => {
   try {
     await AsyncStorage.removeItem(key);

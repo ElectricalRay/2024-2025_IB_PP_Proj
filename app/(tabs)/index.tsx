@@ -9,6 +9,7 @@ import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek} from "@/utils/DataT
 import { TouchableWithoutFeedback } from "react-native";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
+
 export default function Index() {
   const [task, setTask] = useState<string | undefined>();
   const [taskItems, setTaskItems] = useState<Tasks[]>([]);
@@ -23,12 +24,39 @@ export default function Index() {
   }
 
   useEffect(() => {
+    const updateData = async () => {
+      try {
+        const lastExecuted = await asyncStore.getDataItem("lastExecuted")
+        const lastExecutedDate = lastExecuted ? new Date(lastExecuted) : null
+        const now = new Date()
+
+        if (!lastExecutedDate || now.getTime() - lastExecutedDate.getTime() >= 7 * 24 * 60 * 60 * 1000) {
+
+          for(let i = 0; i < days.length; i++) {
+            const tasks = await asyncStore.getItem(days[i])
+            if(tasks && tasks.length > 0) {
+              const newTasks = tasks.map((element: WeekTask) => {
+                element.addedToHome = false
+                element.completed = false
+              })
+              await asyncStore.setItem(days[i], newTasks)
+            }
+          }
+          await asyncStore.setDataItem("lastExecuted", now)
+        }
+      } catch (error) {
+        console.log("Error resetting weekly task data values: ", error)
+      }
+    }
+
+    updateData();
+  })
+
+  useEffect(() => {
     if(!isFocused) {
       setTaskItems([])
     }
   }, [isFocused])
-
-
 
   useEffect(() => {
     if(isFocused){
