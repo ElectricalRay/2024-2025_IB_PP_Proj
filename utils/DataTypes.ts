@@ -11,7 +11,7 @@ interface DefaultTask {
 }
 
 interface DateTask {
-    date: Date,
+    date: string,
     taskDir: string,
     addToHome: boolean
 }

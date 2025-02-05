@@ -16,6 +16,12 @@ export default function Index() {
   const days: DaysOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
   const isFocused = useIsFocused();
 
+  const getFormattedDate = () => {
+    const today = new Date().toLocaleDateString('en-CA')
+    return today
+  }
+
+
   const getDay = () => {
     const today = new Date();
     const dayNum = today.getDay()
@@ -61,6 +67,7 @@ export default function Index() {
   useEffect(() => {
     if(isFocused){
       const today = getDay()
+      const todayDate = getFormattedDate()
 
       const filterOutOldWeeklyTasks = async () => {
         try {
@@ -106,8 +113,42 @@ export default function Index() {
         }
       }
 
+      const getTodayDateTasks = async () => {
+        try {
+          const todayDateTasksJSON = await asyncStore.getItem(todayDate)
+          if(todayDateTasksJSON && todayDateTasksJSON.length > 0) {
+            let notAddedDateTasks = todayDateTasksJSON.filter((task: DateTask) => task.addToHome === false)
+            todayDateTasksJSON.forEach((element: DateTask) => {
+              if(element.addToHome === false) {
+                element.addToHome = true
+              }
+            });
+            await asyncStore.setItem(todayDate, todayDateTasksJSON)
+            const todayTasksJSON = await asyncStore.getItem("today")
+            let allTodayTasks = todayTasksJSON
+            allTodayTasks.push(...notAddedDateTasks)
+            asyncStore.setItem("today", allTodayTasks)
+            setTaskItems(allTodayTasks)
+          }
+        } catch (error) {
+          console.log("Error getting today's date tasks: ", error)
+        }
+      }
+
+      const filterOutOldDateTasks = async () => {
+        try {
+          let allTodayTasks = await asyncStore.getItem("today")
+          const filteredTodayTasks = allTodayTasks.filter((element : Tasks) => ("date" in element && element.date === todayDate) || !("date" in element))
+          await asyncStore.setItem("today", filteredTodayTasks)
+        } catch (error) {
+          console.log("Error filtering out old date tasks:", error)
+        }
+      }
+
+      filterOutOldDateTasks();
       filterOutOldWeeklyTasks();
       getTodayWeeklyTasks();
+      getTodayDateTasks();
       getTodayTasks();
 
     }
@@ -154,6 +195,19 @@ export default function Index() {
         }
 
       }
+
+      if("date" in itemsCopy[index] && "taskDir" in itemsCopy[index] && "addToHome" in itemsCopy[index]) {
+        let dateTasks = await asyncStore.getItem(itemsCopy[index].date)
+        const itemIndex = dateTasks.findIndex((arrItem: Tasks) => arrItem.taskDir === itemsCopy[index].taskDir)
+        console.log("date tasks: ",dateTasks)
+        console.log("item index: ", itemIndex)
+        console.log("items copy index item: ", itemsCopy[index])
+        if(itemIndex >= 0) {
+          dateTasks.splice(itemIndex,1)
+          await asyncStore.setItem(itemsCopy[index].date, dateTasks)
+        }
+      }
+
       itemsCopy.splice(index, 1) 
       await asyncStore.setItem("today", itemsCopy)
       setTaskItems(itemsCopy)

@@ -91,64 +91,66 @@ export default function WeeklyScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
 
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerSectionTitle}>Weekly Tasks</Text>
-          
-          <TouchableOpacity style={styles.addButton} onPress={() => {
-            setAddingItem(!addingItem)
-            setTask(undefined)
-          }}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerSectionTitle}>Weekly Tasks</Text>
             
-            {addingItem ? (
-              <AntDesign name="minus" size={20} color="white" style={{marginLeft: 5}}/>
-            ): (
-              <AntDesign name="plus" size={20} color='white' style={{marginLeft: 5}}/>
-            )}
-            <Text style={styles.btnText}>{addingItem ? "Stop" : "Add Task"}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.addButton} onPress={() => {
+              setAddingItem(!addingItem)
+              setTask(undefined)
+            }}>
+              
+              {addingItem ? (
+                <AntDesign name="minus" size={20} color="white" style={{marginLeft: 5}}/>
+              ): (
+                <AntDesign name="plus" size={20} color='white' style={{marginLeft: 5}}/>
+              )}
+              <Text style={styles.btnText}>{addingItem ? "Stop" : "Add Task"}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.daysContainer}>
+            {
+              days.map((item, index) => {
+                return (
+                  <TouchableOpacity key={index} onPress={() => setDaySelected(item)} style={daySelected === item ? [styles.dayBtn, {backgroundColor: '#ff3d3d'}] : styles.dayBtn}>
+                    <Text style={styles.dayBtnText}>{item.substring(0,1).toUpperCase() + item.substring(1,2)}</Text>
+                  </TouchableOpacity>
+                )
+              })
+            }
+          </View>
         </View>
 
-        <View style={styles.daysContainer}>
-          {
-            days.map((item, index) => {
-              return (
-                <TouchableOpacity key={index} onPress={() => setDaySelected(item)} style={daySelected === item ? [styles.dayBtn, {backgroundColor: '#ff3d3d'}] : styles.dayBtn}>
-                  <Text style={styles.dayBtnText}>{item.substring(0,1).toUpperCase() + item.substring(1,2)}</Text>
-                </TouchableOpacity>
-              )
-            })
-          }
+        <View style={addingItem ? [styles.tasksContainer, {maxHeight: '60%'}] : styles.tasksContainer}>
+          <Text style={styles.tasksSectionTitle}>Tasks</Text>
+
+          <ScrollView style={styles.items}>
+            {
+              tasksList.map((item, index) => {
+                return (
+                  <Task task={item} planning={true} onPress={removeTask} taskIndex={index} key={index}/>
+                )
+              })
+            }
+          </ScrollView>
         </View>
+
+        {addingItem && (
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? "padding" : "height"} style={styles.writeTasksWrapper}>
+            <TextInput style={styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)}/>
+            <TouchableOpacity onPress={() => handleAddTask()}>
+              <View style={styles.addWrapper}>
+                <Text style={styles.addText}>+</Text>
+              </View>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        )}
       </View>
-
-      <View style={styles.tasksContainer}>
-        <Text style={styles.tasksSectionTitle}>Tasks</Text>
-
-        <ScrollView style={addingItem ? [styles.items, {maxHeight: '70%'}] : styles.items}>
-          {
-            tasksList.map((item, index) => {
-              return (
-                <Task task={item} planning={true} onPress={removeTask} taskIndex={index} key={index}/>
-              )
-            })
-          }
-        </ScrollView>
-      </View>
-
-      {addingItem && (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? "padding" : "height"} style={styles.writeTasksWrapper}>
-          <TextInput style={styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)}/>
-          <TouchableOpacity onPress={() => handleAddTask()}>
-            <View style={styles.addWrapper}>
-              <Text style={styles.addText}>+</Text>
-            </View>
-          </TouchableOpacity>
-        </KeyboardAvoidingView>
-      )}
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -207,7 +209,8 @@ const styles = StyleSheet.create({
   },
   tasksContainer: {
     paddingHorizontal: 30,
-    paddingTop: 30
+    paddingTop: 30,
+    maxHeight: '70%'
   },
   tasksSectionTitle: {
     color: '#fff',
@@ -215,8 +218,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   items: {
-    marginTop: 25,
-    maxHeight: '75%'
+    marginTop: 25
   },
   input: {
     paddingVertical: 15,
