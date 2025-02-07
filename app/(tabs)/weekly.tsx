@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   topContainer: {
     paddingTop: 80,
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     borderBottomColor: '#ff3d3d',
     borderWidth: 2
   },

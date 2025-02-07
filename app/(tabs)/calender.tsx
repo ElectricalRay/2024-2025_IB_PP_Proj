@@ -9,32 +9,31 @@ import { AntDesign } from '@expo/vector-icons';
 import { useRef } from 'react';
 import Task from '@/components/tasks';
 
-const MemoizedExpandableCalendar = memo(({onDayPressed, dateSelected, onToggle} : {onDayPressed: any, dateSelected: any, onToggle: any}) => (
-  <ExpandableCalendar
-    firstDay={0}
-    hideArrows={false}
-    disableAllTouchEventsForDisabledDays
-    onDayPress={onDayPressed}
-    onCalendarToggled={onToggle}
-    allowShadow={false}
-    showSixWeeks={true}
-    style={{borderBottomColor: '#ff3d3d', borderBottomWidth: 2}}
-    theme={{
-      backgroundColor: '#25292e',
-      calendarBackground: '#25292e',
-      todayTextColor: '#ff3d3d',
-      dayTextColor: '#ffffff',
-      textDisabledColor: '#9b9b9b',
-      textSectionTitleColor: '#ffffff',
-      monthTextColor: '#ffffff',
-      selectedDayBackgroundColor: '#ff3d3d',
-      selectedDayTextColor: '#25292e',
-      arrowColor: '#ff3d3d',
-      textMonthFontWeight: 'medium',
-    }}
-    disableWeekScroll={true}
-    />
-))
+  const MemoizedExpandableCalendar = memo(({onDayPressed, dateSelected, onToggle} : {onDayPressed: any, dateSelected: any, onToggle: any}) => (
+    <ExpandableCalendar
+      firstDay={0}
+      hideArrows={false}
+      disableAllTouchEventsForDisabledDays
+      onDayPress={onDayPressed}
+      onCalendarToggled={onToggle}
+      allowShadow={false}
+      showSixWeeks={true}
+      style={{borderBottomColor: '#ff3d3d', borderBottomWidth: 2}}
+      theme={{
+        backgroundColor: '#25292e',
+        calendarBackground: '#25292e',
+        todayTextColor: '#ff3d3d',
+        dayTextColor: '#ffffff',
+        textDisabledColor: '#9b9b9b',
+        textSectionTitleColor: '#ffffff',
+        monthTextColor: '#ffffff',
+        selectedDayBackgroundColor: '#ff3d3d',
+        selectedDayTextColor: '#25292e',
+        arrowColor: '#ff3d3d',
+        textMonthFontWeight: 'medium',
+      }}
+      />
+  ))
 
 export default function CalenderScreen() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('en-CA'))
@@ -43,6 +42,7 @@ export default function CalenderScreen() {
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [tasksList, setTaskList] = useState<Tasks[]>([]) 
   const [task, setTask] = useState<string | undefined>()
+  
 
   useEffect(() => {
     console.log('date changed to ', selectedDate)
@@ -66,7 +66,9 @@ export default function CalenderScreen() {
   }, [selectedDate])  
 
   useEffect(() => {
-    setAddingItem(false)
+    if(!isFocused) {
+      setAddingItem(false)
+    }
   }, [isFocused])  
 
   useEffect(() => {
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     verticalAlign: 'auto',
-    paddingHorizontal: 30,
+    paddingHorizontal: 20,
     paddingBottom: 10
   },
   addButton: {
@@ -267,19 +269,3 @@ const styles = StyleSheet.create({
 
    }
 });
-
-
-/*
-<Calendar
-            style={styles.calendar}
-            theme={{
-              backgroundColor: '#25292e',
-              calendarBackground: '#25292e',
-              todayTextColor: '#ff3d3d',
-              dayTextColor: '#ffffff',
-              textDisabledColor: '#9b9b9b',
-              textSectionTitleColor: '#ffffff',
-              monthTextColor: '#ffffff'
-            }}
-          />
-*/

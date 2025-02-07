@@ -1,24 +1,30 @@
 import React from "react";
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/DataTypes";
+import Entypo from '@expo/vector-icons/Entypo';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 type Props = {
     task: Tasks
     planning?: boolean
     taskIndex?: number
     onPress?: (parameter: number) => void
+    completed?: boolean
 }
 
 export default function Task(props: Props) {
-    const {task, planning, taskIndex, onPress} = props
+    const {task, planning, taskIndex, onPress, completed} = props
 
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
-                <View style={styles.square}></View>
+                {"day" in task && <MaterialIcons name="view-week" size={24} color="#ff3d3d" style={styles.square} />}
+                {"date" in task && <Ionicons name="calendar-clear" size={24} color="#ff3d3d" style={styles.square}/>}
+                {!("day" in task) && !("date" in task) && <Entypo name="bookmark" size={24} color="#ff3d3d" style={styles.square}/>}
                 <Text style={styles.itemText}>{task.taskDir}</Text>
             </View>
-            {planning && onPress && taskIndex != undefined ? (
+            {(planning && onPress && taskIndex != undefined) || (completed && onPress && taskIndex != undefined) ? (
                 <TouchableOpacity onPress={() => onPress(taskIndex)}>
                     <Text>Remove</Text>
                 </TouchableOpacity>
@@ -45,11 +51,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap'
     },
     square: {
-        width: 24,
-        height: 24,
-        backgroundColor: '#ff3d3d',
         opacity: 0.4,
-        borderRadius: 5,
         marginRight: 15
     },
     itemText: {
@@ -63,3 +65,8 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
 })
+
+//<Entypo name="bookmark" size={24} color="#ff3d3d" style={styles.square}/>
+//<MaterialIcons name="view-week" size={24} color="#ff3d3d" style={styles.square} />
+//<Ionicons name="calendar-clear" size={24} color="#ff3d3d" style={styles.square}/>
+

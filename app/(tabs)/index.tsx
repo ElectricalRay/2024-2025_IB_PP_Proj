@@ -8,6 +8,7 @@ import * as asyncStore from "@/utils/AsyncStorage";
 import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek} from "@/utils/DataTypes";
 import { TouchableWithoutFeedback } from "react-native";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import Octicons from '@expo/vector-icons/Octicons';
 
 
 export default function Index() {
@@ -15,6 +16,8 @@ export default function Index() {
   const [taskItems, setTaskItems] = useState<Tasks[]>([]);
   const days: DaysOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
   const isFocused = useIsFocused();
+  const [todoOrCompleted, setTodoOrCompleted] = useState(false)
+  const [completedTasks, setCompletedTasks] = useState<Tasks[]>([])
 
   const getFormattedDate = () => {
     const today = new Date().toLocaleDateString('en-CA')
@@ -61,6 +64,7 @@ export default function Index() {
   useEffect(() => {
     if(!isFocused) {
       setTaskItems([])
+      setTodoOrCompleted(false)
     }
   }, [isFocused])
 
@@ -145,6 +149,21 @@ export default function Index() {
         }
       }
 
+      const getCompleted = async () => {
+        try {
+          const completedJSON = await asyncStore.getItem("complete")
+          if(completedJSON && completedJSON.length > 0) {
+            setCompletedTasks(completedJSON)
+          }
+        } catch (error) {
+          console.log("Error getting completed tasks: ", error)
+        }
+      }
+
+      if(todoOrCompleted) {
+        getCompleted()
+      }
+
       filterOutOldDateTasks();
       filterOutOldWeeklyTasks();
       getTodayWeeklyTasks();
@@ -152,7 +171,7 @@ export default function Index() {
       getTodayTasks();
 
     }
-  }, [task, isFocused])
+  }, [task, isFocused, todoOrCompleted])
 
   const handleAddTask = async () => {
     Keyboard.dismiss()
@@ -183,6 +202,7 @@ export default function Index() {
   const completeTask = async (index:number) => {
     try {
       let itemsCopy = [...taskItems];
+
       if("day" in itemsCopy[index] && "taskDir" in itemsCopy[index] && "completed" in itemsCopy[index]) {
         const weeklyTasks = await asyncStore.getItem(itemsCopy[index].day)
         const itemIndex = weeklyTasks.findIndex((arrItem: Tasks) => arrItem.taskDir === itemsCopy[index].taskDir)
@@ -208,6 +228,10 @@ export default function Index() {
         }
       }
 
+      const completed = await asyncStore.getItem("complete")
+      completed.push(itemsCopy[index])
+      await asyncStore.setItem("complete", completed)
+
       itemsCopy.splice(index, 1) 
       await asyncStore.setItem("today", itemsCopy)
       setTaskItems(itemsCopy)
@@ -216,14 +240,37 @@ export default function Index() {
     }
   }
 
+  const onCompletedRemove = async (index : number) => {
+    try {
+      let itemsCopy = [...completedTasks]
+      itemsCopy.splice(index, 1)
+      await asyncStore.setItem("complete", itemsCopy)
+      setCompletedTasks(itemsCopy)
+    } catch (error) {
+      console.log("Error removing completed task: ", error)
+    } 
+  }
+
   return (
     <TouchableWithoutFeedback onPress={() =>Keyboard.dismiss()}>
       <View style={styles.container}>
         <View style={styles.tasksWrapper}>
-          <Text style={styles.sectionTitle}>Today's Tasks</Text>
+          <View style={styles.headerContainer}>
+            <Text style={styles.sectionTitle}>{todoOrCompleted ? "Completed Tasks" : "Today's Tasks"}</Text>
+            <TouchableOpacity onPress={() => setTodoOrCompleted(!todoOrCompleted)} style={styles.toggleButton}>
+              <Octicons name="arrow-switch" size={20} color="white" />
+              <Text style={styles.toggleBtnText}>{todoOrCompleted ? "To Do" : "Completed"}</Text>
+            </TouchableOpacity>
+          </View>
+          
 
           <ScrollView style={styles.items}>
-            {
+            {todoOrCompleted ?
+              completedTasks.map((item, index) => {
+                return (
+                 <Task task={item} completed={true} onPress={onCompletedRemove} taskIndex={index} key={index}/>
+                )
+              }) : 
               taskItems.map((item, index) => {
                 return (
                   <TouchableOpacity key={index} onPress={() => completeTask(index)}>
@@ -259,7 +306,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#fff'
   },
@@ -297,5 +344,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center'
+  },
+  headerContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    verticalAlign: 'auto'
+  },
+  toggleButton: {
+    backgroundColor: '#ff3d3d',
+    width: 112.5,
+    height: 45,
+    borderRadius: 45,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center'
+  },
+  toggleBtnText: {
+   color: '#fff',
+   fontSize: 12,
+   fontWeight: 'bold',
   }
 });
