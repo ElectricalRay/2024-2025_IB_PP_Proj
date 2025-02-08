@@ -9,15 +9,91 @@ import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek} from "@/utils/DataT
 import { TouchableWithoutFeedback } from "react-native";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import Octicons from '@expo/vector-icons/Octicons';
+import { useContext } from "react";
+import { ThemeContext } from "@/constants/ThemeContext";
 
 
 export default function Index() {
+  const theme = useContext(ThemeContext)
+  if (!theme) return null;
+
   const [task, setTask] = useState<string | undefined>();
   const [taskItems, setTaskItems] = useState<Tasks[]>([]);
   const days: DaysOfWeek[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
   const isFocused = useIsFocused();
   const [todoOrCompleted, setTodoOrCompleted] = useState(false)
   const [completedTasks, setCompletedTasks] = useState<Tasks[]>([])
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#25292e'
+    },
+    tasksWrapper: {
+      paddingTop: 80,
+      paddingHorizontal: 20,
+    },
+    sectionTitle: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      color: '#fff'
+    },
+    items: {
+      marginTop: 30,
+      maxHeight: '85%'
+    },
+    input: {
+      paddingVertical: 15,
+      paddingHorizontal: 15,
+      backgroundColor: '#fff',
+      borderRadius: 60,
+      borderColor: '#cococo',
+      borderWidth: 1,
+      width: 250,
+  
+    },
+    addWrapper: {
+      width: 60,
+      height: 60,
+      backgroundColor: '#fff',
+      borderRadius: 60,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderColor: '#cococo',
+      borderWidth: 1,
+    },
+    addText: {
+  
+    },
+    writeTasksWrapper: {
+      position: 'absolute',
+      bottom: 20,
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center'
+    },
+    headerContainer: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      verticalAlign: 'auto'
+    },
+    toggleButton: {
+      backgroundColor: theme.accentColor,
+      width: 112.5,
+      height: 45,
+      borderRadius: 45,
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      alignItems: 'center'
+    },
+    toggleBtnText: {
+     color: '#fff',
+     fontSize: 12,
+     fontWeight: 'bold',
+    }
+  });
 
   const getFormattedDate = () => {
     const today = new Date().toLocaleDateString('en-CA')
@@ -160,15 +236,20 @@ export default function Index() {
         }
       }
 
+      const doAll = async () => {
+        await filterOutOldDateTasks();
+        await filterOutOldWeeklyTasks();
+        await getTodayWeeklyTasks();
+        await getTodayDateTasks();
+        await getTodayTasks();
+      }
+
       if(todoOrCompleted) {
         getCompleted()
       }
 
-      filterOutOldDateTasks();
-      filterOutOldWeeklyTasks();
-      getTodayWeeklyTasks();
-      getTodayDateTasks();
-      getTodayTasks();
+      doAll()
+      
 
     }
   }, [task, isFocused, todoOrCompleted])
@@ -296,73 +377,3 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#25292e'
-  },
-  tasksWrapper: {
-    paddingTop: 80,
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#fff'
-  },
-  items: {
-    marginTop: 30,
-    maxHeight: '85%'
-  },
-  input: {
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    backgroundColor: '#fff',
-    borderRadius: 60,
-    borderColor: '#cococo',
-    borderWidth: 1,
-    width: 250,
-
-  },
-  addWrapper: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#fff',
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#cococo',
-    borderWidth: 1,
-  },
-  addText: {
-
-  },
-  writeTasksWrapper: {
-    position: 'absolute',
-    bottom: 20,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center'
-  },
-  headerContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    verticalAlign: 'auto'
-  },
-  toggleButton: {
-    backgroundColor: '#ff3d3d',
-    width: 112.5,
-    height: 45,
-    borderRadius: 45,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center'
-  },
-  toggleBtnText: {
-   color: '#fff',
-   fontSize: 12,
-   fontWeight: 'bold',
-  }
-});

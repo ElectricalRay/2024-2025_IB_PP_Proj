@@ -1,12 +1,17 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useContext } from "react";
+import { ThemeContext } from "@/constants/ThemeContext";
 
 export default function TabLayout() {
+  const theme = useContext(ThemeContext)
+  if (!theme) return null;
+
   return (
     <Tabs 
         screenOptions={{
-            tabBarActiveTintColor: '#ff3d3d',
+            tabBarActiveTintColor: theme.accentColor,
             tabBarStyle: {
                 backgroundColor: '#25292e'
             },

@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, TextInput, ScrollView } from 'react-native';
-import React, { memo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useState, useEffect } from "react";
 import * as asyncStore from "@/utils/AsyncStorage";
 import { DateTask, DefaultTask, WeekTask, Tasks, DaysOfWeek } from "@/utils/DataTypes";
@@ -8,41 +8,105 @@ import { useIsFocused } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
 import { useRef } from 'react';
 import Task from '@/components/tasks';
-
-  const MemoizedExpandableCalendar = memo(({onDayPressed, dateSelected, onToggle} : {onDayPressed: any, dateSelected: any, onToggle: any}) => (
-    <ExpandableCalendar
-      firstDay={0}
-      hideArrows={false}
-      disableAllTouchEventsForDisabledDays
-      onDayPress={onDayPressed}
-      onCalendarToggled={onToggle}
-      allowShadow={false}
-      showSixWeeks={true}
-      style={{borderBottomColor: '#ff3d3d', borderBottomWidth: 2}}
-      theme={{
-        backgroundColor: '#25292e',
-        calendarBackground: '#25292e',
-        todayTextColor: '#ff3d3d',
-        dayTextColor: '#ffffff',
-        textDisabledColor: '#9b9b9b',
-        textSectionTitleColor: '#ffffff',
-        monthTextColor: '#ffffff',
-        selectedDayBackgroundColor: '#ff3d3d',
-        selectedDayTextColor: '#25292e',
-        arrowColor: '#ff3d3d',
-        textMonthFontWeight: 'medium',
-      }}
-      />
-  ))
+import { useContext } from "react";
+import { ThemeContext } from "@/constants/ThemeContext";
 
 export default function CalenderScreen() {
+  const theme = useContext(ThemeContext)
+      if (!theme) return null;
+
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('en-CA'))
   const isFocused = useIsFocused();
   const [addingItem, setAddingItem] = useState<boolean>(false)
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
   const [tasksList, setTaskList] = useState<Tasks[]>([]) 
   const [task, setTask] = useState<string | undefined>()
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#25292e'
+    },
+    topSection: {
+      backgroundColor: '#25292e',
+      paddingTop: 80,
+    },
+    headerText: {
+      color: '#ffffff',
+      fontWeight: 'bold',
+      fontSize: 30
+    },
+    calendarContainer: {
+      height: 144,
+    },
+    calendar: {
+      flex: 1,
+    },
+    headerContainer: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      verticalAlign: 'auto',
+      paddingHorizontal: 20,
+      paddingBottom: 10
+    },
+    addButton: {
+      backgroundColor: theme.accentColor,
+      width: 112.5,
+      height: 45,
+      borderRadius: 45,
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      alignItems: 'center'
+    },
+    btnText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: 'bold',
+      marginRight: 5
+     },
+     taskContainer: {
+      paddingHorizontal: 30,
+      paddingTop: 30,
+      maxHeight: '58%'
+     },
+     tasksSectionTitle: {
+      color: '#fff',
+      fontSize: 20,
+      fontWeight: 'bold',
+      paddingBottom: 20
+     },
+     writeTasksWrapper: {
+      position: 'absolute',
+      bottom: 10,
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center'
+     },
+     input: {
+      paddingVertical: 15,
+      paddingHorizontal: 15,
+      backgroundColor: '#fff',
+      borderRadius: 60,
+      borderColor: '#cococo',
+      borderWidth: 1,
+      width: 250,
+     },
+     addWrapper: {
+      width: 60,
+      height: 60,
+      backgroundColor: '#fff',
+      borderRadius: 60,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderColor: '#cococo',
+      borderWidth: 1,
+     },
+     addText: {
   
+     }
+  });
 
   useEffect(() => {
     console.log('date changed to ', selectedDate)
@@ -150,7 +214,30 @@ export default function CalenderScreen() {
               date={selectedDate}
             >
               <View>
-                <MemoizedExpandableCalendar onDayPressed={handleDaySelect} dateSelected={selectedDate} onToggle={handleExpand}/>
+                <ExpandableCalendar
+                key={theme.accentColor}
+                firstDay={0}
+                hideArrows={false}
+                disableAllTouchEventsForDisabledDays
+                onDayPress={handleDaySelect}
+                onCalendarToggled={handleExpand}
+                allowShadow={false}
+                showSixWeeks={true}
+                style={{borderBottomColor: theme.accentColor, borderBottomWidth: 2}}
+                theme={{
+                  backgroundColor: '#25292e',
+                  calendarBackground: '#25292e',
+                  todayTextColor: theme.accentColor,
+                  dayTextColor: '#ffffff',
+                  textDisabledColor: '#9b9b9b',
+                  textSectionTitleColor: '#ffffff',
+                  monthTextColor: '#ffffff',
+                  selectedDayBackgroundColor: theme.accentColor,
+                  selectedDayTextColor: '#25292e',
+                  arrowColor: theme.accentColor,
+                  textMonthFontWeight: 'medium',
+                }}
+                />
               </View>
             </CalendarProvider>
           </View>
@@ -184,88 +271,3 @@ export default function CalenderScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#25292e'
-  },
-  topSection: {
-    backgroundColor: '#25292e',
-    paddingTop: 80,
-  },
-  headerText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 30
-  },
-  calendarContainer: {
-    height: 144,
-  },
-  calendar: {
-    flex: 1,
-  },
-  headerContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    verticalAlign: 'auto',
-    paddingHorizontal: 20,
-    paddingBottom: 10
-  },
-  addButton: {
-    backgroundColor: '#ff3d3d',
-    width: 112.5,
-    height: 45,
-    borderRadius: 45,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center'
-  },
-  btnText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginRight: 5
-   },
-   taskContainer: {
-    paddingHorizontal: 30,
-    paddingTop: 30,
-    maxHeight: '58%'
-   },
-   tasksSectionTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingBottom: 20
-   },
-   writeTasksWrapper: {
-    position: 'absolute',
-    bottom: 10,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center'
-   },
-   input: {
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    backgroundColor: '#fff',
-    borderRadius: 60,
-    borderColor: '#cococo',
-    borderWidth: 1,
-    width: 250,
-   },
-   addWrapper: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#fff',
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#cococo',
-    borderWidth: 1,
-   },
-   addText: {
-
-   }
-});

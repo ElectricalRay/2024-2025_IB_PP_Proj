@@ -107,6 +107,14 @@ export const getMultiple = async (keys: string[]) => {
     }
 }
 
+export const clearStorage = async () => {
+  try {
+    await AsyncStorage.clear();
+  } catch (error) {
+    console.log("Error clearing storage: ", error)
+  }
+}
+
 interface Data {
   day: number,
   month: number,
