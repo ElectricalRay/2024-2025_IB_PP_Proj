@@ -23,47 +23,48 @@ export default function Index() {
   const isFocused = useIsFocused();
   const [todoOrCompleted, setTodoOrCompleted] = useState(false)
   const [completedTasks, setCompletedTasks] = useState<Tasks[]>([])
+  const [render, setRender] = useState(false)
 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#25292e'
+      backgroundColor: theme.primaryColor
     },
     tasksWrapper: {
       paddingTop: 80,
-      paddingHorizontal: 20,
     },
     sectionTitle: {
       fontSize: 30,
       fontWeight: 'bold',
-      color: '#fff'
+      color: theme.secondaryColor
     },
     items: {
       marginTop: 30,
-      maxHeight: '85%'
+      maxHeight: '85%',
+      paddingHorizontal: 20
     },
     input: {
       paddingVertical: 15,
       paddingHorizontal: 15,
-      backgroundColor: '#fff',
+      backgroundColor: theme.secondaryColor,
       borderRadius: 60,
-      borderColor: '#cococo',
+      borderColor: theme.primaryColor,
       borderWidth: 1,
       width: 250,
-  
+      color: theme.primaryColor
     },
     addWrapper: {
       width: 60,
       height: 60,
-      backgroundColor: '#fff',
+      backgroundColor: theme.secondaryColor,
       borderRadius: 60,
       justifyContent: 'center',
       alignItems: 'center',
-      borderColor: '#cococo',
+      borderColor: theme.primaryColor,
       borderWidth: 1,
     },
     addText: {
-  
+      color: theme.primaryColor
     },
     writeTasksWrapper: {
       position: 'absolute',
@@ -77,7 +78,12 @@ export default function Index() {
       display: 'flex',
       justifyContent: 'space-between',
       flexDirection: 'row',
-      verticalAlign: 'auto'
+      verticalAlign: 'auto',
+      width: '100%',
+      borderBottomColor: theme.accentColor,
+      borderBottomWidth: 2,
+      paddingBottom: 20,
+      paddingHorizontal: 20
     },
     toggleButton: {
       backgroundColor: theme.accentColor,
@@ -89,7 +95,7 @@ export default function Index() {
       alignItems: 'center'
     },
     toggleBtnText: {
-     color: '#fff',
+     color: theme.secondaryColor,
      fontSize: 12,
      fontWeight: 'bold',
     }
@@ -254,6 +260,12 @@ export default function Index() {
     }
   }, [task, isFocused, todoOrCompleted])
 
+  useEffect(() => {
+    if(!todoOrCompleted || !isFocused) {
+      setCompletedTasks([])
+    }
+  }, [todoOrCompleted, isFocused])
+
   const handleAddTask = async () => {
     Keyboard.dismiss()
     if(task){
@@ -339,7 +351,7 @@ export default function Index() {
           <View style={styles.headerContainer}>
             <Text style={styles.sectionTitle}>{todoOrCompleted ? "Completed Tasks" : "Today's Tasks"}</Text>
             <TouchableOpacity onPress={() => setTodoOrCompleted(!todoOrCompleted)} style={styles.toggleButton}>
-              <Octicons name="arrow-switch" size={20} color="white" />
+              <Octicons name="arrow-switch" size={20} color={theme.secondaryColor} />
               <Text style={styles.toggleBtnText}>{todoOrCompleted ? "To Do" : "Completed"}</Text>
             </TouchableOpacity>
           </View>
@@ -349,13 +361,13 @@ export default function Index() {
             {todoOrCompleted ?
               completedTasks.map((item, index) => {
                 return (
-                 <Task task={item} completed={true} onPress={onCompletedRemove} taskIndex={index} key={index}/>
+                 <Task task={item} completed={true} onPress={onCompletedRemove} taskIndex={index} key={index} mode={theme.mode}/>
                 )
               }) : 
               taskItems.map((item, index) => {
                 return (
                   <TouchableOpacity key={index} onPress={() => completeTask(index)}>
-                    <Task task={item}/>
+                    <Task task={item} mode={theme.mode}/>
                   </TouchableOpacity>
                 )
               })
@@ -364,9 +376,9 @@ export default function Index() {
         </View>
 
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.writeTasksWrapper}>
-          <TextInput style={styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)}/>
+          <TextInput style={theme.mode === 'light' ? [styles.input, {backgroundColor: '#616161'}] : styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)} placeholderTextColor={theme.primaryColor}/>
           <TouchableOpacity onPress={() => handleAddTask()}>
-            <View style={styles.addWrapper}>
+            <View style={theme.mode === 'light' ? [styles.addWrapper, {backgroundColor: '#616161'}] : styles.addWrapper}>
               <Text style={styles.addText}>+</Text>
             </View>
           </TouchableOpacity>

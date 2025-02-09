@@ -25,14 +25,14 @@ export default function CalenderScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#25292e'
+      backgroundColor: theme.primaryColor
     },
     topSection: {
-      backgroundColor: '#25292e',
+      backgroundColor: theme.primaryColor,
       paddingTop: 80,
     },
     headerText: {
-      color: '#ffffff',
+      color: theme.secondaryColor,
       fontWeight: 'bold',
       fontSize: 30
     },
@@ -60,7 +60,7 @@ export default function CalenderScreen() {
       alignItems: 'center'
     },
     btnText: {
-      color: '#fff',
+      color: theme.secondaryColor,
       fontSize: 12,
       fontWeight: 'bold',
       marginRight: 5
@@ -71,7 +71,7 @@ export default function CalenderScreen() {
       maxHeight: '58%'
      },
      tasksSectionTitle: {
-      color: '#fff',
+      color: theme.secondaryColor,
       fontSize: 20,
       fontWeight: 'bold',
       paddingBottom: 20
@@ -87,24 +87,25 @@ export default function CalenderScreen() {
      input: {
       paddingVertical: 15,
       paddingHorizontal: 15,
-      backgroundColor: '#fff',
+      backgroundColor: theme.secondaryColor,
       borderRadius: 60,
-      borderColor: '#cococo',
+      borderColor: theme.primaryColor,
       borderWidth: 1,
       width: 250,
+      color: theme.primaryColor
      },
      addWrapper: {
       width: 60,
       height: 60,
-      backgroundColor: '#fff',
+      backgroundColor: theme.secondaryColor,
       borderRadius: 60,
       justifyContent: 'center',
       alignItems: 'center',
-      borderColor: '#cococo',
+      borderColor: theme.primaryColor,
       borderWidth: 1,
      },
      addText: {
-  
+      color: theme.primaryColor
      }
   });
 
@@ -127,11 +128,12 @@ export default function CalenderScreen() {
 
       getTasks()
     }
-  }, [selectedDate])  
+  }, [selectedDate, isFocused])  
 
   useEffect(() => {
     if(!isFocused) {
       setAddingItem(false)
+      setTaskList([])
     }
   }, [isFocused])  
 
@@ -202,9 +204,9 @@ export default function CalenderScreen() {
               setAddingItem(!addingItem)
             }}>
               {addingItem ? (
-                <AntDesign name='minus' size={20} color={'white'} style={{marginLeft: 5}}/>
+                <AntDesign name='minus' size={20} color={theme.secondaryColor} style={{marginLeft: 5}}/>
               ) : (
-                <AntDesign name='plus' size={20} color={'white'} style={{marginLeft: 5}}/>
+                <AntDesign name='plus' size={20} color={theme.secondaryColor} style={{marginLeft: 5}}/>
               )}
               <Text style={styles.btnText}>{addingItem ? "Stop" : "Add Task"}</Text>
             </TouchableOpacity>
@@ -215,7 +217,7 @@ export default function CalenderScreen() {
             >
               <View>
                 <ExpandableCalendar
-                key={theme.accentColor}
+                key={`${theme.accentColor}-${theme.mode}`}
                 firstDay={0}
                 hideArrows={false}
                 disableAllTouchEventsForDisabledDays
@@ -225,15 +227,15 @@ export default function CalenderScreen() {
                 showSixWeeks={true}
                 style={{borderBottomColor: theme.accentColor, borderBottomWidth: 2}}
                 theme={{
-                  backgroundColor: '#25292e',
-                  calendarBackground: '#25292e',
+                  backgroundColor: theme.primaryColor,
+                  calendarBackground: theme.primaryColor,
                   todayTextColor: theme.accentColor,
-                  dayTextColor: '#ffffff',
+                  dayTextColor: theme.secondaryColor,
                   textDisabledColor: '#9b9b9b',
-                  textSectionTitleColor: '#ffffff',
-                  monthTextColor: '#ffffff',
+                  textSectionTitleColor: theme.secondaryColor,
+                  monthTextColor: theme.secondaryColor,
                   selectedDayBackgroundColor: theme.accentColor,
-                  selectedDayTextColor: '#25292e',
+                  selectedDayTextColor: theme.primaryColor,
                   arrowColor: theme.accentColor,
                   textMonthFontWeight: 'medium',
                 }}
@@ -249,7 +251,7 @@ export default function CalenderScreen() {
             {
               tasksList.map((item, index) => {
                 return (
-                  <Task task={item} planning={true} onPress={removeTask} taskIndex={index} key={index}/>
+                  <Task task={item} planning={true} onPress={removeTask} taskIndex={index} key={index} mode={theme.mode}/>
                 )
               })
             }
@@ -258,9 +260,9 @@ export default function CalenderScreen() {
 
         {addingItem && (
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.writeTasksWrapper}>
-            <TextInput style={styles.input} placeholder='Write a task' value={task} onChangeText={text => setTask(text)}/>
+            <TextInput style={theme.mode === 'light' ? [styles.input, {backgroundColor: '#616161'}] : styles.input} placeholder='Write a task' value={task} onChangeText={text => setTask(text)} placeholderTextColor={theme.primaryColor}/>
             <TouchableOpacity onPress={() => handleAddTask()}>
-              <View style={styles.addWrapper}>
+              <View style={theme.mode === 'light' ? [styles.addWrapper, {backgroundColor: '#616161'}] : styles.addWrapper}>
                 <Text style={styles.addText}>+</Text>
               </View>
             </TouchableOpacity>

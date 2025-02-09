@@ -26,7 +26,7 @@ export default function WeeklyScreen() {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#25292e',
+      backgroundColor: theme.primaryColor,
     },
     topContainer: {
       paddingTop: 80,
@@ -41,7 +41,7 @@ export default function WeeklyScreen() {
       verticalAlign: 'auto'
     },
     headerSectionTitle: {
-      color: '#ffffff',
+      color: theme.secondaryColor,
       fontWeight: 'bold',
       fontSize: 30,
     },
@@ -55,7 +55,7 @@ export default function WeeklyScreen() {
       alignItems: 'center'
     },
     btnText: {
-     color: '#fff',
+     color: theme.secondaryColor,
      fontSize: 12,
      fontWeight: 'bold',
      marginRight: 5
@@ -74,7 +74,7 @@ export default function WeeklyScreen() {
     },
     dayBtnText: {
       fontSize: 15,
-      color: '#fff'
+      color: theme.secondaryColor
     },
     tasksContainer: {
       paddingHorizontal: 30,
@@ -82,7 +82,7 @@ export default function WeeklyScreen() {
       maxHeight: '70%'
     },
     tasksSectionTitle: {
-      color: '#fff',
+      color: theme.secondaryColor,
       fontSize: 20,
       fontWeight: 'bold'
     },
@@ -92,25 +92,25 @@ export default function WeeklyScreen() {
     input: {
       paddingVertical: 15,
       paddingHorizontal: 15,
-      backgroundColor: '#fff',
+      backgroundColor: theme.secondaryColor,
       borderRadius: 60,
-      borderColor: '#cococo',
+      borderColor: theme.primaryColor,
       borderWidth: 1,
       width: 250,
-  
+      color: theme.primaryColor
     },
     addWrapper: {
       width: 60,
       height: 60,
-      backgroundColor: '#fff',
+      backgroundColor: theme.secondaryColor,
       borderRadius: 60,
       justifyContent: 'center',
       alignItems: 'center',
-      borderColor: '#cococo',
+      borderColor: theme.primaryColor,
       borderWidth: 1,
     },
     addText: {
-  
+      color: theme.primaryColor
     },
     writeTasksWrapper: {
       position: 'absolute',
@@ -143,11 +143,12 @@ export default function WeeklyScreen() {
 
       getTasks()
     } 
-  }, [daySelected])
+  }, [daySelected, isFocused])
 
   useEffect(() => {
     if(!isFocused) {
       setAddingItem(false)
+      setTaskList([])
     }
   }, [isFocused])
 
@@ -195,7 +196,7 @@ export default function WeeklyScreen() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} >
       <View style={styles.container}>
         <View style={styles.topContainer}>
 
@@ -208,9 +209,9 @@ export default function WeeklyScreen() {
             }}>
               
               {addingItem ? (
-                <AntDesign name="minus" size={20} color="white" style={{marginLeft: 5}}/>
+                <AntDesign name="minus" size={20} color={theme.secondaryColor} style={{marginLeft: 5}}/>
               ): (
-                <AntDesign name="plus" size={20} color='white' style={{marginLeft: 5}}/>
+                <AntDesign name="plus" size={20} color={theme.secondaryColor} style={{marginLeft: 5}}/>
               )}
               <Text style={styles.btnText}>{addingItem ? "Stop" : "Add Task"}</Text>
             </TouchableOpacity>
@@ -236,7 +237,7 @@ export default function WeeklyScreen() {
             {
               tasksList.map((item, index) => {
                 return (
-                  <Task task={item} planning={true} onPress={removeTask} taskIndex={index} key={index}/>
+                  <Task task={item} planning={true} onPress={removeTask} taskIndex={index} key={index} mode={theme.mode}/>
                 )
               })
             }
@@ -245,9 +246,9 @@ export default function WeeklyScreen() {
 
         {addingItem && (
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? "padding" : "height"} style={styles.writeTasksWrapper}>
-            <TextInput style={styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)}/>
+            <TextInput style={theme.mode === 'light' ? [styles.input, {backgroundColor: '#616161'}] : styles.input} placeholder="Write a task" value={task} onChangeText={text => setTask(text)} placeholderTextColor={theme.primaryColor}/>
             <TouchableOpacity onPress={() => handleAddTask()}>
-              <View style={styles.addWrapper}>
+              <View style={theme.mode === 'light' ? [styles.addWrapper, {backgroundColor: '#616161'}] : styles.addWrapper}>
                 <Text style={styles.addText}>+</Text>
               </View>
             </TouchableOpacity>

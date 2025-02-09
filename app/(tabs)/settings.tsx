@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, ScrollView, SectionList } from "react-native";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useContext } from "react";
@@ -7,15 +7,12 @@ import { ThemeContext } from "@/constants/ThemeContext";
 import * as asyncStore from '@/utils/AsyncStorage';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { reloadAppAsync } from "expo";
-
-
-//<AntDesign name="eye" size={24} color="black" />
-//<Entypo name="database" size={24} color="black" />
+import { useIsFocused } from "@react-navigation/native";
 
 const DATA = [
     {
         title: 'Appearance',
-        data: ['Accent Color']
+        data: ['Accent Color', 'Enable Light Mode', 'Enable Dark Mode']
     },
     {
         title: 'System',
@@ -25,6 +22,10 @@ const DATA = [
 export default function SettingsScreen () {
     const theme = useContext(ThemeContext)
     if(!theme) return null;
+
+    const [allCleared, setAllCleared] = useState(false)
+    const [completedCleared, setCompletedCleared] = useState(false)
+    const isFocused = useIsFocused();
 
     const accentColors = [
         {color: '#ff3d3d', name: 'red'},
@@ -38,7 +39,7 @@ export default function SettingsScreen () {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: '#25292e'
+            backgroundColor: theme.primaryColor
         },
         headingContainer: {
             justifyContent: 'space-between',
@@ -52,7 +53,7 @@ export default function SettingsScreen () {
         headingTitle: {
             fontSize: 30,
             fontWeight: 'bold',
-            color: '#fff',
+            color: theme.secondaryColor,
             paddingTop: 80,
             paddingHorizontal: 20,
         },
@@ -64,7 +65,7 @@ export default function SettingsScreen () {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            backgroundColor: '#25292e',
+            backgroundColor: theme.primaryColor,
             paddingVertical: 15,
             paddingHorizontal: 10,
             borderRadius: 10,
@@ -78,13 +79,13 @@ export default function SettingsScreen () {
         sectionItemText: {
             fontSize: 15,
             fontWeight: '500',
-            color: '#fff',
+            color: theme.secondaryColor,
             verticalAlign: 'middle'
         }, 
         sectionHeader: {
             display: 'flex',
             flexDirection: 'row',
-            backgroundColor: '#25292e',
+            backgroundColor: theme.primaryColor,
             marginTop: 15,
             marginBottom: 10,
             paddingVertical: 10,
@@ -92,7 +93,7 @@ export default function SettingsScreen () {
             borderRadius: 5,
         },
         sectionHeaderText: {
-            color: '#fff',
+            color: theme.secondaryColor,
             fontWeight: 'bold',
             fontSize: 20,
         },
@@ -124,32 +125,66 @@ export default function SettingsScreen () {
         },
         systemBtnText: {
             fontWeight: 'bold',
-            color: '#fff'
+            color: theme.secondaryColor
         }
     })
+
+    useEffect(() => {
+        if(!isFocused) {
+            setAllCleared(false)
+            setCompletedCleared(false)
+        }
+    }, [isFocused])
 
     const handleAccentChange = (colorObj: {color: string, name: string}) => {
         theme.setAccentColor(colorObj.color)
     }
 
     const handleExecute = async () => {
-        try {
-            const color = await AsyncStorage.getItem("accentColor")
-            await asyncStore.clearStorage();
-            color && theme.setAccentColor(color)
-            reloadAppAsync();
-        } catch (error) {
-            console.log("Error resetting accent color after clearing storage: ", error)
+        if(!allCleared) {
+            try {
+                const color = await AsyncStorage.getItem("accentColor")
+                await asyncStore.clearStorage();
+                color && theme.setAccentColor(color)
+                setAllCleared(true)
+            } catch (error) {
+                console.log("Error resetting accent color after clearing storage: ", error)
+            }
         }
+
         
     }
 
     const handleCompleteClear = async () => {
-        try {
-            await asyncStore.removeItem('complete')
-        } catch (error) {
-            console.log("Error clearing completed: ", error)
+        if(!completedCleared) {
+            try {
+                const color = await AsyncStorage.getItem("accentColor")
+                await asyncStore.removeItem('complete')
+                color && theme.setAccentColor(color)
+                setCompletedCleared(true)
+            } catch (error) {
+                console.log("Error clearing completed: ", error)
+            }
         }
+        
+    }
+
+    const handleDarkMode = () => {
+        if(theme.mode === 'light') {
+            theme.setPrimaryColor('#25292e')
+            theme.setSecondaryColor('#ffffff')
+            theme.setMode('dark')
+        }
+        
+    }
+
+    const handleLightMode = () => {
+        if(theme.mode === 'dark') {
+            theme.setPrimaryColor('#ffffff')
+            theme.setSecondaryColor('#25292e')
+            theme.setMode('light')
+        }
+        
     }
 
     return (
@@ -177,22 +212,34 @@ export default function SettingsScreen () {
                             {
                                 item === 'Clear All Tasks' &&
                                     <TouchableOpacity style={styles.systemButton} onPress={() => handleExecute()}>
-                                        <Text style={styles.systemBtnText}>Clear</Text>
+                                        <Text style={styles.systemBtnText}>{allCleared ? 'Cleared': 'Clear'}</Text>
                                     </TouchableOpacity>
                             }
                             {
                                 item === 'Clear Completed' && 
                                     <TouchableOpacity style={styles.systemButton} onPress={() => handleCompleteClear()}>
-                                        <Text style={styles.systemBtnText}>Clear</Text>
+                                        <Text style={styles.systemBtnText}>{completedCleared ? 'Cleared' : 'Clear'}</Text>
                                     </TouchableOpacity>
+                            }
+                            {
+                                item === 'Enable Light Mode' && 
+                                    <TouchableOpacity style={styles.systemButton} onPress={() => handleLightMode()}>
+                                        <Text style={styles.systemBtnText}>{theme.mode === "light" ? 'Enabled' : 'Enable'}</Text>
+                                        </TouchableOpacity>
+                            }
+                            {
+                                item === 'Enable Dark Mode' && 
+                                    <TouchableOpacity style={styles.systemButton} onPress={() => handleDarkMode()}>
+                                        <Text style={styles.systemBtnText}>{theme.mode === "dark" ? 'Enabled' : 'Enable'}</Text>
+                                        </TouchableOpacity>
                             }
                         </View>
                     )}
                     renderSectionHeader={({section: {title}}) => (
                         <View style={styles.sectionHeader}>
                             <View style={styles.headerIconContainer}>
-                                {title === 'Appearance' && <AntDesign name="eye" size={30} color="#25292e" />}
-                                {title === 'System' && <Entypo name="database" size={30} color="#25292e" />}
+                                {title === 'Appearance' && <AntDesign name="eye" size={30} color={theme.primaryColor} style={{padding: 2}}/>}
+                                {title === 'System' && <Entypo name="database" size={30} color={theme.primaryColor} style={{padding: 2}}/>}
                             </View>
                             <Text style={styles.sectionHeaderText}>{title}</Text>
                         </View>
