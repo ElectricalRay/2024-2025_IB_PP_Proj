@@ -108,7 +108,7 @@ export default function SettingsScreen () {
             width: 24,
             height: 24,
             borderRadius: 5,
-            marginLeft: 15,
+            marginLeft: 10,
         },
         squaresContainer: {
             display: 'flex',
@@ -212,25 +212,25 @@ export default function SettingsScreen () {
                             {
                                 item === 'Clear All Tasks' &&
                                     <TouchableOpacity style={styles.systemButton} onPress={() => handleExecute()}>
-                                        <Text style={styles.systemBtnText}>{allCleared ? 'Cleared': 'Clear'}</Text>
+                                        <Text style={allCleared ? [styles.systemBtnText, {opacity: 0.5}] : styles.systemBtnText}>{allCleared ? 'Cleared': 'Clear'}</Text>
                                     </TouchableOpacity>
                             }
                             {
                                 item === 'Clear Completed' && 
                                     <TouchableOpacity style={styles.systemButton} onPress={() => handleCompleteClear()}>
-                                        <Text style={styles.systemBtnText}>{completedCleared ? 'Cleared' : 'Clear'}</Text>
+                                        <Text style={completedCleared ? [styles.systemBtnText, {opacity: 0.5}] : styles.systemBtnText}>{completedCleared ? 'Cleared' : 'Clear'}</Text>
                                     </TouchableOpacity>
                             }
                             {
                                 item === 'Enable Light Mode' && 
                                     <TouchableOpacity style={styles.systemButton} onPress={() => handleLightMode()}>
-                                        <Text style={styles.systemBtnText}>{theme.mode === "light" ? 'Enabled' : 'Enable'}</Text>
+                                        <Text style={theme.mode === "light" ? [styles.systemBtnText, {opacity: 0.5}] : styles.systemBtnText}>{theme.mode === "light" ? 'Enabled' : 'Enable'}</Text>
                                         </TouchableOpacity>
                             }
                             {
                                 item === 'Enable Dark Mode' && 
                                     <TouchableOpacity style={styles.systemButton} onPress={() => handleDarkMode()}>
-                                        <Text style={styles.systemBtnText}>{theme.mode === "dark" ? 'Enabled' : 'Enable'}</Text>
+                                        <Text style={theme.mode === "dark" ? [styles.systemBtnText, {opacity: 0.5}] : styles.systemBtnText}>{theme.mode === "dark" ? 'Enabled' : 'Enable'}</Text>
                                         </TouchableOpacity>
                             }
                         </View>
