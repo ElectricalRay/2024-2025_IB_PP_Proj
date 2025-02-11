@@ -2,7 +2,7 @@ Hello my name is Rayyan Khalique and at the creation of this repository I am a C
 This repository is all of the code for the personal project product I made, which was a personal management to do list mobile application made with React Native and Expo. 
 
 # Prerequisites:
-Make sure you have the following installed before running the projectL 
+Make sure you have the following installed before running the project: 
 - Node.js
 - Expo CLI
 
