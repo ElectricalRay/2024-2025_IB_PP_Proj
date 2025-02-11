@@ -10,6 +10,11 @@ import { useRef } from 'react';
 import Task from '@/components/tasks';
 import { useContext } from "react";
 import { ThemeContext } from "@/constants/ThemeContext";
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  "Warning: ExpandableCalendar: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
+])
 
 export default function CalenderScreen() {
   const theme = useContext(ThemeContext)
