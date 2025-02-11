@@ -1,14 +1,13 @@
 Hello my name is Rayyan Khalique and at the creation of this repository I am a Centennial High School IB MYP Sophomore. 
 This repository is all of the code for the personal project product I made, which was a personal management to do list mobile application made with React Native and Expo. 
 
-# Welcome to your Expo app 👋
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-## Get started
-1. Install dependencies
+# To run my application you must: 
+1. Git clone this repository onto your device.
+2. Install dependencies
    ```bash
    npm install
    ```
-2. Start the app
+3. Start the app
    ```bash
     npx expo start
    ```
