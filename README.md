@@ -28,3 +28,6 @@ In the output, you'll find options to open the app in a
 You can choose to build the app with Expo's EAS for cloud based development, or local development. 
 
 Here is a demo video of my application: https://drive.google.com/file/d/1PEh-k1scpP6Y_KMfe1cJ78j1pG7fhgHz/view?usp=sharing
+
+# Non Development Way
+You can also just install the apk file in the latest release on ur phone to try the app. 
